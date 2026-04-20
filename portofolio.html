@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ilham — Visual Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0A0A0A;
+  --bg2: #111111;
+  --bg3: #161616;
+  --border: rgba(255,255,255,0.07);
+  --text: #F5F3EF;
+  --muted: rgba(245,243,239,0.45);
+  --dim: rgba(245,243,239,0.2);
+  --gold: #C8922A;
+  --gold2: #E8B84B;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ── */
+.cursor {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: transform 0.1s;
+}
+.cursor-ring {
+  width: 36px; height: 36px;
+  border: 1px solid rgba(200,146,42,0.5);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: all 0.18s ease;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 28px 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.4s, background 0.4s, padding 0.4s;
+}
+nav.scrolled {
+  background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(20px);
+  border-color: var(--border);
+  padding: 20px 60px;
+}
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text); text-decoration: none;
+}
+.nav-logo span { color: var(--gold); }
+.nav-links { display: flex; gap: 40px; list-style: none; }
+.nav-links a {
+  font-size: 12px; font-weight: 400;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); text-decoration: none;
+  transition: color 0.3s;
+  position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute;
+  bottom: -4px; left: 0; right: 0; height: 1px;
+  background: var(--gold);
+  transform: scaleX(0); transform-origin: right;
+  transition: transform 0.3s ease;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+.nav-cta {
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gold); text-decoration: none;
+  border: 1px solid rgba(200,146,42,0.4);
+  padding: 10px 22px; border-radius: 2px;
+  transition: all 0.3s;
+}
+.nav-cta:hover { background: var(--gold); color: var(--bg); }
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 120px 60px 80px;
+  position: relative; overflow: hidden;
+}
+
+.hero-noise {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4; pointer-events: none;
+}
+
+.hero-glow {
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,146,42,0.08) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 760px; }
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 36px;
+  opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+}
+.hero-tag::before {
+  content: ''; display: block;
+  width: 32px; height: 1px; background: var(--gold);
+}
+
+.hero-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(64px, 10vw, 110px);
+  font-weight: 300; line-height: 0.95;
+  letter-spacing: -2px;
+  margin-bottom: 28px;
+  opacity: 0; animation: fadeUp 0.9s 0.35s forwards;
+}
+.hero-name em { font-style: italic; color: var(--gold); }
+
+.hero-sub {
+  font-size: clamp(14px, 2vw, 16px);
+  color: var(--muted); line-height: 1.8;
+  max-width: 520px; margin-bottom: 52px;
+  opacity: 0; animation: fadeUp 0.9s 0.5s forwards;
+}
+
+.hero-actions {
+  display: flex; align-items: center; gap: 32px;
+  opacity: 0; animation: fadeUp 0.9s 0.65s forwards;
+}
+
+.btn-gold {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 16px 32px; border-radius: 2px;
+  text-decoration: none; border: none; cursor: none;
+  transition: all 0.3s;
+}
+.btn-gold:hover { background: var(--gold2); transform: translateY(-2px); }
+
+.btn-outline {
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); text-decoration: none;
+  display: flex; align-items: center; gap: 10px;
+  transition: color 0.3s;
+}
+.btn-outline:hover { color: var(--text); }
+.btn-outline span {
+  display: block; width: 32px; height: 1px;
+  background: currentColor; transition: width 0.3s;
+}
+.btn-outline:hover span { width: 48px; }
+
+.hero-scroll {
+  position: absolute; bottom: 48px; left: 60px;
+  display: flex; align-items: center; gap: 14px;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--dim);
+  opacity: 0; animation: fadeUp 0.9s 1s forwards;
+}
+.scroll-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scrollAnim 2s ease-in-out infinite;
+}
+@keyframes scrollAnim {
+  0%,100% { transform: scaleY(1); opacity:1; }
+  50% { transform: scaleY(0.5); opacity:0.4; }
+}
+
+/* hero stats */
+.hero-stats {
+  position: absolute; bottom: 48px; right: 60px;
+  display: flex; gap: 48px;
+  opacity: 0; animation: fadeUp 0.9s 0.8s forwards;
+}
+.stat { text-align: right; }
+.stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px; font-weight: 300;
+  color: var(--text); line-height: 1;
+}
+.stat-num span { color: var(--gold); font-size: 20px; }
+.stat-lbl { font-size: 11px; letter-spacing: 1.5px; color: var(--dim); margin-top: 4px; }
+
+/* ── DIVIDER ── */
+.section-divider {
+  height: 1px; background: var(--border);
+  margin: 0 60px;
+}
+
+/* ── SECTION BASE ── */
+section { padding: 120px 60px; }
+
+.section-header {
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 72px;
+}
+.section-num {
+  font-size: 11px; letter-spacing: 3px;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 300; line-height: 1.1;
+}
+.section-title em { font-style: italic; color: var(--gold); }
+.section-link {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); text-decoration: none;
+  display: flex; align-items: center; gap: 10px;
+  transition: color 0.3s; flex-shrink: 0;
+}
+.section-link:hover { color: var(--gold); }
+
+/* ── PORTFOLIO ── */
+#portfolio { background: var(--bg); }
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 2px;
+}
+
+.portfolio-item {
+  position: relative; overflow: hidden;
+  background: var(--bg3);
+  cursor: none;
+}
+.portfolio-item:first-child {
+  grid-row: span 2;
+  min-height: 680px;
+}
+.portfolio-item:not(:first-child) { min-height: 330px; }
+
+.portfolio-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease, filter 0.7s ease;
+  filter: brightness(0.6) saturate(0.8);
+}
+.portfolio-item:hover .portfolio-img {
+  transform: scale(1.04);
+  filter: brightness(0.75) saturate(1);
+}
+
+/* color placeholder images */
+.portfolio-item .p-placeholder {
+  width: 100%; height: 100%; min-height: inherit;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px;
+  transition: transform 0.7s ease;
+}
+.portfolio-item:hover .p-placeholder { transform: scale(1.04); }
+.pc1 { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
+.pc2 { background: linear-gradient(135deg, #1a1206 0%, #2d1f00 60%, #3d2a00 100%); }
+.pc3 { background: linear-gradient(135deg, #0d1f12 0%, #1a3a20 100%); }
+
+.portfolio-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+  padding: 36px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  opacity: 0.7; transition: opacity 0.4s;
+}
+.portfolio-item:hover .portfolio-overlay { opacity: 1; }
+
+.p-cat {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 10px;
+}
+.p-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(20px, 3vw, 30px); font-weight: 300;
+  line-height: 1.2; margin-bottom: 8px;
+}
+.p-year { font-size: 12px; color: var(--dim); }
+
+.p-arrow {
+  position: absolute; top: 28px; right: 28px;
+  width: 44px; height: 44px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); font-size: 16px;
+  opacity: 0; transform: translateY(8px);
+  transition: all 0.4s;
+}
+.portfolio-item:hover .p-arrow { opacity: 1; transform: translateY(0); }
+
+/* ── SERVICES / ALUR KERJA ── */
+#services { background: var(--bg2); }
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.service-card {
+  background: var(--bg3);
+  padding: 44px 36px;
+  position: relative; overflow: hidden;
+  transition: background 0.4s;
+}
+.service-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform: scaleX(0);
+  transition: transform 0.5s ease;
+}
+.service-card:hover { background: #1A1A1A; }
+.service-card:hover::before { transform: scaleX(1); }
+
+.s-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 64px; font-weight: 300;
+  color: var(--border);
+  line-height: 1; margin-bottom: 28px;
+  transition: color 0.4s;
+}
+.service-card:hover .s-num { color: rgba(200,146,42,0.15); }
+
+.s-icon {
+  font-size: 28px; margin-bottom: 20px;
+}
+.s-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 400;
+  margin-bottom: 14px; line-height: 1.2;
+}
+.s-desc {
+  font-size: 13px; color: var(--muted);
+  line-height: 1.8; margin-bottom: 28px;
+}
+.s-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.s-tag {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--dim);
+  border: 1px solid var(--border);
+  padding: 5px 12px; border-radius: 2px;
+}
+
+/* ── WORKFLOW / ALUR KERJA ── */
+#workflow { background: var(--bg); }
+
+.workflow-intro {
+  max-width: 600px; margin-bottom: 80px;
+}
+.workflow-intro p {
+  font-size: 15px; color: var(--muted); line-height: 1.9;
+}
+
+.workflow-steps {
+  display: flex; flex-direction: column;
+  gap: 0; border: 1px solid var(--border);
+}
+
+.wf-step {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+  cursor: default;
+}
+.wf-step:last-child { border-bottom: none; }
+.wf-step:hover { background: var(--bg2); }
+
+.wf-num {
+  padding: 36px 28px;
+  border-right: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px; font-weight: 300;
+  color: var(--gold); letter-spacing: 1px;
+  padding-top: 40px;
+}
+
+.wf-main {
+  padding: 36px 40px;
+  border-right: 1px solid var(--border);
+}
+.wf-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 400;
+  margin-bottom: 10px;
+}
+.wf-sub { font-size: 12px; color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase; }
+
+.wf-detail {
+  padding: 36px 40px;
+  font-size: 13px; color: var(--muted);
+  line-height: 1.8;
+}
+.wf-detail ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.wf-detail li {
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.wf-detail li::before {
+  content: '—'; color: var(--gold); flex-shrink: 0;
+  margin-top: 1px; font-size: 12px;
+}
+
+.wf-timeline {
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-top: 8px;
+}
+.wf-days {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 40px; font-weight: 300;
+  color: rgba(200,146,42,0.3);
+  line-height: 1;
+}
+.wf-days span { font-size: 13px; font-family: 'Outfit', sans-serif; color: var(--dim); letter-spacing: 1px; }
+
+/* ── ABOUT ── */
+#about { background: var(--bg2); }
+
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+
+.about-visual {
+  position: relative;
+}
+.about-frame {
+  width: 100%; aspect-ratio: 3/4;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 80px; color: var(--border);
+  position: relative; overflow: hidden;
+}
+.about-frame::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(200,146,42,0.04) 0%, transparent 60%);
+}
+.about-badge {
+  position: absolute; bottom: -20px; right: -20px;
+  width: 120px; height: 120px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--bg);
+}
+.ab-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px; font-weight: 600; line-height: 1;
+}
+.ab-lbl { font-size: 10px; font-weight: 500; letter-spacing: 1px; text-align: center; }
+
+.about-content {}
+.about-bio {
+  font-size: 15px; color: var(--muted);
+  line-height: 1.9; margin-bottom: 40px;
+}
+.about-bio strong { color: var(--text); font-weight: 400; }
+
+.about-skills { display: flex; flex-direction: column; gap: 14px; }
+.skill-row { display: flex; align-items: center; gap: 16px; }
+.skill-name { font-size: 12px; letter-spacing: 1px; color: var(--muted); width: 140px; flex-shrink: 0; }
+.skill-bar {
+  flex: 1; height: 1px; background: var(--border); position: relative;
+}
+.skill-fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  transition: width 1.2s ease;
+}
+.skill-pct { font-size: 11px; color: var(--dim); width: 36px; text-align: right; flex-shrink: 0; }
+
+/* ── CONTACT ── */
+#contact {
+  background: var(--bg);
+  text-align: center;
+  padding: 160px 60px;
+  position: relative; overflow: hidden;
+}
+
+.contact-glow {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 700px; height: 400px;
+  background: radial-gradient(ellipse, rgba(200,146,42,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.contact-label {
+  font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 28px;
+}
+
+.contact-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 300; line-height: 1.05;
+  margin-bottom: 28px;
+}
+.contact-heading em { font-style: italic; color: var(--gold); }
+
+.contact-sub {
+  font-size: 14px; color: var(--muted);
+  margin-bottom: 60px; line-height: 1.8;
+}
+
+.contact-email {
+  display: inline-block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 3vw, 26px); font-weight: 300;
+  color: var(--text); text-decoration: none;
+  border-bottom: 1px solid rgba(200,146,42,0.3);
+  padding-bottom: 8px; margin-bottom: 60px;
+  transition: border-color 0.3s, color 0.3s;
+}
+.contact-email:hover { color: var(--gold); border-color: var(--gold); }
+
+.social-row { display: flex; justify-content: center; gap: 32px; }
+.social-link {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  transition: color 0.3s;
+}
+.social-link:hover { color: var(--gold); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 32px 60px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 600; letter-spacing: 2px;
+  color: var(--muted);
+}
+.footer-logo span { color: var(--gold); }
+.footer-copy { font-size: 12px; color: var(--dim); letter-spacing: 0.5px; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  nav { padding: 24px 28px; }
+  nav.scrolled { padding: 18px 28px; }
+  .nav-links { display: none; }
+  #hero, section { padding-left: 28px; padding-right: 28px; }
+  .section-divider { margin: 0 28px; }
+  .hero-stats { right: 28px; gap: 28px; }
+  .hero-scroll { left: 28px; }
+  .hero-name { font-size: clamp(52px, 14vw, 80px); }
+  .portfolio-grid { grid-template-columns: 1fr; }
+  .portfolio-item:first-child { grid-row: span 1; min-height: 420px; }
+  .services-grid { grid-template-columns: 1fr; }
+  .about-grid { grid-template-columns: 1fr; gap: 48px; }
+  .about-frame { aspect-ratio: 4/3; }
+  .wf-step { grid-template-columns: 52px 1fr; }
+  .wf-detail { display: none; }
+  footer { flex-direction: column; gap: 12px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">I<span>.</span>lham</a>
+  <ul class="nav-links">
+    <li><a href="#portfolio">Portofolio</a></li>
+    <li><a href="#services">Layanan</a></li>
+    <li><a href="#workflow">Alur Kerja</a></li>
+    <li><a href="#about">Tentang</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Hubungi Saya</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-noise"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag">Visual Designer & Brand Strategist</div>
+    <h1 class="hero-name">
+      Desain yang<br><em>Berbicara</em><br>Sendiri.
+    </h1>
+    <p class="hero-sub">
+      Saya Ilham — menciptakan identitas visual korporat yang kohesif, elegan, dan berdampak. Dari banner hingga sistem desain yang lengkap.
+    </p>
+    <div class="hero-actions">
+      <a href="#portfolio" class="btn-gold">
+        Lihat Karya
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
+      </a>
+      <a href="#workflow" class="btn-outline">
+        <span></span>Alur Kerja
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">80<span>+</span></div>
+      <div class="stat-lbl">Proyek Selesai</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">5<span>+</span></div>
+      <div class="stat-lbl">Tahun Pengalaman</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-num">01 — Portofolio</div>
+      <h2 class="section-title">Karya <em>Terpilih</em></h2>
+    </div>
+    <a href="#contact" class="section-link">Semua Proyek →</a>
+  </div>
+
+  <div class="portfolio-grid reveal">
+
+    <div class="portfolio-item">
+      <div class="p-placeholder pc1">🏙️</div>
+      <div class="portfolio-overlay">
+        <div class="p-cat">Brand Identity</div>
+        <div class="p-title">Nexora Corporate Suite</div>
+        <div class="p-year">2024</div>
+      </div>
+      <div class="p-arrow">↗</div>
+    </div>
+
+    <div class="portfolio-item">
+      <div class="p-placeholder pc2" style="font-size:36px;">📊</div>
+      <div class="portfolio-overlay">
+        <div class="p-cat">Banner Promosi</div>
+        <div class="p-title">FinVest Campaign Series</div>
+        <div class="p-year">2024</div>
+      </div>
+      <div class="p-arrow">↗</div>
+    </div>
+
+    <div class="portfolio-item">
+      <div class="p-placeholder pc3" style="font-size:36px;">🌿</div>
+      <div class="portfolio-overlay">
+        <div class="p-cat">Web Visual Assets</div>
+        <div class="p-title">Verdana Product Launch</div>
+        <div class="p-year">2023</div>
+      </div>
+      <div class="p-arrow">↗</div>
+    </div>
+
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-num">02 — Layanan</div>
+      <h2 class="section-title">Apa yang Saya <em>Tawarkan</em></h2>
+    </div>
+  </div>
+
+  <div class="services-grid">
+
+    <div class="service-card reveal">
+      <div class="s-num">01</div>
+      <div class="s-icon">◈</div>
+      <div class="s-title">Banner Promosi</div>
+      <div class="s-desc">Banner web berkualitas tinggi yang dirancang untuk menarik perhatian, mengkomunikasikan penawaran, dan mendorong konversi secara efektif.</div>
+      <div class="s-tags">
+        <span class="s-tag">Web Banner</span>
+        <span class="s-tag">CTA Design</span>
+        <span class="s-tag">A/B Variants</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="s-num">02</div>
+      <div class="s-icon">◉</div>
+      <div class="s-title">Visual Produk</div>
+      <div class="s-desc">Presentasi produk yang bersih dan sesuai brand — menampilkan fitur utama dengan hierarki visual yang jelas dan estetika korporat yang konsisten.</div>
+      <div class="s-tags">
+        <span class="s-tag">Product Cards</span>
+        <span class="s-tag">Feature Highlight</span>
+        <span class="s-tag">Brand Alignment</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="s-num">03</div>
+      <div class="s-icon">◇</div>
+      <div class="s-title">Infografis Layanan</div>
+      <div class="s-desc">Grafis informasi yang ringkas dan mudah dipahami — mengubah kompleksitas layanan menjadi narasi visual yang intuitif bagi audiens.</div>
+      <div class="s-tags">
+        <span class="s-tag">Infographic</span>
+        <span class="s-tag">Data Viz</span>
+        <span class="s-tag">Process Flow</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- WORKFLOW -->
+<section id="workflow">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-num">03 — Alur Kerja</div>
+      <h2 class="section-title">Proses yang <em>Transparan</em></h2>
+    </div>
+  </div>
+
+  <div class="workflow-intro reveal">
+    <p>Setiap proyek dijalankan dengan struktur yang jelas — dari briefing hingga ekspor akhir. Anda selalu tahu di mana kami berada dan apa yang akan datang selanjutnya.</p>
+  </div>
+
+  <div class="workflow-steps reveal">
+
+    <div class="wf-step">
+      <div class="wf-num">01</div>
+      <div class="wf-main">
+        <div class="wf-sub">Discovery</div>
+        <div class="wf-title">Brief & Pemahaman</div>
+      </div>
+      <div class="wf-detail">
+        <ul>
+          <li>Konsultasi mendalam tentang brand, tujuan, dan audiens target</li>
+          <li>Pengumpulan aset: logo, warna, font, teks konten</li>
+          <li>Analisis referensi dan kompetitor</li>
+          <li>Penentuan scope, timeline, dan format output</li>
+        </ul>
+        <div class="wf-timeline">
+          <div class="wf-days">D1 <span>hari ke-1</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-step">
+      <div class="wf-num">02</div>
+      <div class="wf-main">
+        <div class="wf-sub">Concept</div>
+        <div class="wf-title">Konsep & Moodboard</div>
+      </div>
+      <div class="wf-detail">
+        <ul>
+          <li>Penyusunan moodboard dan arah visual</li>
+          <li>Pemilihan palet warna, tipografi, dan gaya elemen</li>
+          <li>Wireframe layout untuk setiap aset</li>
+          <li>Presentasi konsep untuk persetujuan sebelum eksekusi</li>
+        </ul>
+        <div class="wf-timeline">
+          <div class="wf-days">D2 <span>hari ke-2</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-step">
+      <div class="wf-num">03</div>
+      <div class="wf-main">
+        <div class="wf-sub">Design</div>
+        <div class="wf-title">Eksekusi & Desain</div>
+      </div>
+      <div class="wf-detail">
+        <ul>
+          <li>Produksi seluruh aset: banner, visual produk, infografis</li>
+          <li>Konsistensi font, warna, dan tone di semua material</li>
+          <li>Pengiriman konsep awal dalam 3 hari kerja</li>
+          <li>File kerja berlapis (PSD/AI) disiapkan sejak awal</li>
+        </ul>
+        <div class="wf-timeline">
+          <div class="wf-days">D3 <span>hari ke-3</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-step">
+      <div class="wf-num">04</div>
+      <div class="wf-main">
+        <div class="wf-sub">Revision</div>
+        <div class="wf-title">Revisi & Penyempurnaan</div>
+      </div>
+      <div class="wf-detail">
+        <ul>
+          <li>Hingga 2 putaran revisi berdasarkan feedback Anda</li>
+          <li>Penyesuaian hierarki pesan jika diperlukan</li>
+          <li>Saran peningkatan alur visual secara proaktif</li>
+          <li>Setiap revisi diselesaikan dalam 1 hari kerja</li>
+        </ul>
+        <div class="wf-timeline">
+          <div class="wf-days">D5 <span>hari ke-4/5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-step">
+      <div class="wf-num">05</div>
+      <div class="wf-main">
+        <div class="wf-sub">Delivery</div>
+        <div class="wf-title">Ekspor & Serah Terima</div>
+      </div>
+      <div class="wf-detail">
+        <ul>
+          <li>PNG/JPG teroptimasi untuk web (loading cepat, kualitas prima)</li>
+          <li>PSD & AI berlapis untuk pengeditan mandiri di masa depan</li>
+          <li>Panduan penggunaan aset singkat (opsional)</li>
+          <li>Arsip proyek terorganisir via Google Drive / WeTransfer</li>
+        </ul>
+        <div class="wf-timeline">
+          <div class="wf-days">D6 <span>hari ke-6/7</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-num">04 — Tentang</div>
+      <h2 class="section-title">Tentang <em>Ilham</em></h2>
+    </div>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-visual reveal">
+      <div class="about-frame">
+        <span style="font-size:100px; color: rgba(200,146,42,0.12);">I</span>
+      </div>
+      <div class="about-badge">
+        <div class="ab-num">5+</div>
+        <div class="ab-lbl">Tahun<br>Exp</div>
+      </div>
+    </div>
+
+    <div class="about-content reveal">
+      <p class="about-bio">
+        Saya adalah <strong>visual designer</strong> yang berfokus pada identitas korporat dan aset web. Dengan lebih dari 5 tahun pengalaman, saya membantu bisnis — dari startup hingga perusahaan besar — tampil <strong>konsisten, profesional, dan berkesan</strong> di mata audiens mereka.
+        <br><br>
+        Pendekatan saya menggabungkan <strong>strategi merek</strong> dengan eksekusi desain yang teliti. Saya tidak hanya membuat yang terlihat bagus — saya memastikan setiap elemen visual <strong>bekerja untuk tujuan bisnis Anda</strong>.
+      </p>
+
+      <div class="about-skills">
+        <div class="skill-row">
+          <div class="skill-name">Brand Identity</div>
+          <div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div>
+          <div class="skill-pct">95%</div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">Web Visual Assets</div>
+          <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div>
+          <div class="skill-pct">90%</div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">Infographic Design</div>
+          <div class="skill-bar"><div class="skill-fill" style="width:88%"></div></div>
+          <div class="skill-pct">88%</div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">Motion & Animation</div>
+          <div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div>
+          <div class="skill-pct">75%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-glow"></div>
+  <div class="reveal">
+    <div class="contact-label">05 — Kontak</div>
+    <h2 class="contact-heading">
+      Mari Mulai<br><em>Proyek Anda</em>
+    </h2>
+    <p class="contact-sub">
+      Punya proyek di tangan? Kirim detail brand Anda dan saya akan<br>kembali dalam 24 jam dengan estimasi dan langkah selanjutnya.
+    </p>
+    <a href="mailto:ilham@email.com" class="contact-email">raishamid70075@email.com</a>
+    <div class="social-row">
+     
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">I<span>.</span>lham</div>
+  <div class="footer-copy">© 2026 Ilham — Visual Designer. All rights reserved.</div>
+</footer>
+
+<script>
+// Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+
+function animateRing() {
+  rx += (mx - rx) * 0.14;
+  ry += (my - ry) * 0.14;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button, .portfolio-item, .service-card, .wf-step').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    ring.style.width = '60px'; ring.style.height = '60px';
+    ring.style.borderColor = 'rgba(200,146,42,0.8)';
+    cursor.style.transform = 'translate(-50%,-50%) scale(1.8)';
+  });
+  el.addEventListener('mouseleave', () => {
+    ring.style.width = '36px'; ring.style.height = '36px';
+    ring.style.borderColor = 'rgba(200,146,42,0.5)';
+    cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+  });
+});
+
+// Nav scroll
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(r => io.observe(r));
+</script>
+</body>
+</html>
